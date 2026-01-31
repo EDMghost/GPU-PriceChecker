@@ -1,9 +1,11 @@
 from playwright.sync_api import sync_playwright
 import re
 
+from Runner.Delay import human_delay
+
 
 class ArukeresoScraper:
-    def __init__(self, headless=True):
+    def __init__(self, headless=False):
         self.headless = headless
 
     def scrape_gpu(self, gpu_model: str, target_price: int):
@@ -12,9 +14,21 @@ class ArukeresoScraper:
         url = f"https://www.arukereso.hu/videokartya-c3142/{search_query}/?orderby=1"
 
         with sync_playwright() as p:
-            browser = p.chromium.launch(headless=self.headless)
-            page = browser.new_page()
+            browser = p.chromium.launch(
+                headless=self.headless,
+                args=["--disable-blink-features=AutomationControlled"]
+            )
+            page = browser.new_page(
+                user_agent=(
+                    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                    "AppleWebKit/537.36 (KHTML, like Gecko) "
+                    "Chrome/120.0.0.0 Safari/537.36"
+                ),
+                viewport={"width": 1366, "height": 768}
+            )
+
             page.goto(url)
+            human_delay(2, 5)
 
             page.wait_for_selector("a.price")
 
@@ -29,6 +43,7 @@ class ArukeresoScraper:
                 price_text = a.inner_text().strip()
                 price = int(re.sub(r"[^\d]", "", price_text))
                 products.append((name, price))
+                human_delay(0.05, 0.15)
 
             browser.close()
 
