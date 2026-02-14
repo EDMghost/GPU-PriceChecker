@@ -8,3 +8,4 @@ GPU Price Checker for certain GPU's I'm interested in namely:
 Specifically on the following websites:
   - Arukereso.hu (Hungarian)
   - Price.ro (Romanian)
+  - Geizhals.de (German)
